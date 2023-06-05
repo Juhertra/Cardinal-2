@@ -1,0 +1,50 @@
+{
+    "report_title": {
+        "name": "Title",
+        "fields": {
+            "name": {
+                "title": "Default",
+                "type": "text"
+            },
+            "date": {
+                "title": "Date",
+                "type": "date"
+            }
+        }
+    },
+    "executive_summary": {
+        "name": "Executive Summary",
+        "fields": {
+            "summary": {
+                "title": "Summary",
+                "type": "textarea"
+            }
+        }
+    },
+    "vulnerabilities": {
+        "name": "Vulnerabilities",
+        "fields": {
+            "name": {
+                "title": "Name",
+                "type": "text"
+            },
+            "description": {
+                "title": "Description",
+                "type": "textarea"  
+            },
+            "recommendations": {
+                "title": "Recommendations",
+                "type": "textarea"  
+            }
+        }
+    },
+    "methodology": {
+        "name": "Methodology",
+        "fields": {
+            "description": {
+                "title": "Description",
+                "type": "textarea"
+            }
+        }
+    }
+}

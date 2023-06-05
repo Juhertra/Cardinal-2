@@ -1,0 +1,341 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block content %}
+{% csrf_token %}
+<script>
+  var csrf_token = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+</script>
+
+<div class="container mt-5">
+  <h1>Penetration Test Report</h1>
+  <div class="form-group">
+    <label for="template-selector">Select a Template</label>
+    <select class="form-control" id="template-selector">
+      <option value="">--Choose a Template--</option>
+      {% for template in report_templates %}
+      <option value="{{ template.id }}">{{ template.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="report-sections connectedSortable">
+    <!-- The sections will be rendered by JavaScript -->
+  </div>
+  <!-- Add more fields if needed -->
+
+  <div class="mt-3">
+    <button id="save-report" class="btn btn-primary" data-toggle="modal" data-target="#saveReportModal">Save Report</button>
+    <button id="cancel-report" class="btn btn-danger">Cancel</button>
+  </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Load the default template sections when the page is loaded
+        const defaultTemplateId = "{{ report_template.id }}";
+        if (defaultTemplateId) {
+            updateLayout(defaultTemplateId);
+        }
+
+        $(".existing-fields").sortable({
+            connectWith: ".connectedSortable",
+            placeholder: "ui-state-highlight",
+            update: function (event, ui) {
+                updateFieldOrder();
+            }
+        }).disableSelection();
+    });
+
+function renderSections(sections, customSections) {
+    $(".report-sections").empty();
+    for (const [sectionId, sectionData] of Object.entries(sections)) {
+        let fieldsHtml = '';
+
+        if (sectionId !== 'vulnerabilities') {
+            for (const [fieldId, fieldData] of Object.entries(sectionData.fields || {})) {
+                fieldsHtml += `
+                    <div class="form-group">
+                        <label for="${fieldId}">${fieldData.title}</label>
+                        ${createFieldElement(fieldId, fieldData)}
+                    </div>
+                `;
+            }
+        }
+
+        if (sectionId === 'vulnerabilities') {
+            fieldsHtml += `<div id="vulnerabilities-container"></div>`;
+        }
+
+        const addButtonHtml = sectionId === 'vulnerabilities' ? `<button class="btn btn-sm btn-success add-vulnerability-btn" data-sections='${JSON.stringify(sections)}'>Add Vulnerability</button>` : '';
+        const sectionHtml = `
+            <div data-section-id="${sectionId}" class="section-box mb-3">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between" id="heading-${sectionId}">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-${sectionId}" aria-expanded="true" aria-controls="collapse-${sectionId}">
+                                ${sectionData.name}
+                            </button>
+                        </h5>
+                        ${addButtonHtml}
+                    </div>
+                    <div id="collapse-${sectionId}" class="collapse" aria-labelledby="heading-${sectionId}" data-parent=".report-sections">
+                        <div class="card-body">
+                            ${fieldsHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        $(".report-sections").append(sectionHtml);
+    }
+}
+
+
+
+function createFieldElement(fieldId, fieldData) {
+    switch (fieldData.type) {
+        case 'text':
+            return `<input type="text" class="form-control" id="${fieldId}" placeholder="${fieldData.title}">`;
+        case 'date':
+            return `<input type="date" class="form-control" id="${fieldId}" placeholder="${fieldData.title}">`;
+        case 'textarea':
+            return `<textarea class="form-control" id="${fieldId}" rows="3" placeholder="${fieldData.title}"></textarea>`;
+        // Add more field types here as needed
+        default:
+            return '';
+    }
+}
+
+
+let vulnerabilityCounter = 1;
+
+function createVulnerability(sections) {
+    const vulnerabilityId = `vulnerability-${vulnerabilityCounter}`;
+
+    // Get the vulnerability template from the 'defaultSections' variable
+    const vulnerabilityTemplate = sections['vulnerabilities'];
+
+    // Create the fields HTML using the fields from the vulnerability template
+    let fieldsHtml = '';
+    for (const [fieldId, fieldData] of Object.entries(vulnerabilityTemplate.fields || {})) {
+        fieldsHtml += `
+            <div class="form-group">
+                <label for="${fieldId}-${vulnerabilityCounter}">${fieldData.title}</label>
+                ${createFieldElement(`${fieldId}-${vulnerabilityCounter}`, fieldData)}
+            </div>
+        `;
+    }
+
+    const vulnerabilityHtml = `
+        <div id="${vulnerabilityId}" class="vulnerability-item mb-3">
+            <div class="card">
+                <div class="card-header" id="heading-${vulnerabilityId}">
+                    <h6 class="mb-0 d-flex justify-content-between align-items-center">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-${vulnerabilityId}" aria-expanded="true" aria-controls="collapse-${vulnerabilityId}">
+                            Vulnerability #${vulnerabilityCounter}
+                        </button>
+                        <button class="btn btn-sm btn-danger remove-vulnerability-btn">Remove</button>
+                    </h6>
+                </div>
+                <div id="collapse-${vulnerabilityId}" class="collapse" aria-labelledby="heading-${vulnerabilityId}" data-parent="#vulnerabilities-container">
+                    <div class="card-body">
+                        ${fieldsHtml}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    vulnerabilityCounter++;
+    return vulnerabilityHtml;
+}
+
+function renumberVulnerabilities() {
+    let counter = 1;
+    $(".vulnerability-item").each(function() {
+        $(this).find("button.btn-link").text("Vulnerability #" + counter);
+        counter++;
+    });
+}
+
+
+$(document).on("click", ".add-vulnerability-btn", function() {
+    // Get the sections data from the stored attribute
+    const sectionsData = JSON.parse($(this).attr("data-sections") || "{}");
+    $("#vulnerabilities-container").append(createVulnerability(sectionsData));
+});
+
+
+$(document).on("click", ".remove-vulnerability-btn", function() {
+    $(this).closest(".vulnerability-item").remove();
+    renumberVulnerabilities(); // Renumber the vulnerabilities
+    vulnerabilityCounter--; // Decrement the vulnerability counter
+});
+
+function updateLayout(templateId) {
+    $.ajax({
+        url: `/get_template_data/${templateId}/`,
+        headers: { "X-CSRFToken": csrf_token },
+        success: function(response) {
+            const sections = response.sections;
+            const custom_sections = JSON.parse(response.custom_sections || "[]");
+            renderSections(sections, custom_sections);
+        },
+        error: function(response) {
+            console.log(response);
+            // Handle error
+        }
+    });
+}
+
+$("#template-selector").change(function () {
+    const selectedTemplateId = $(this).val();
+    if (selectedTemplateId) {
+        updateLayout(selectedTemplateId);
+    }
+});
+
+$(document).ready(function () {
+    $("#confirmSaveReport").click(function (event) {
+        console.log("Save button clicked");
+        event.preventDefault();
+        const reportName = $("#reportName").val().trim() || 'Untitled Report';
+        const reportDescription = $("#reportDescription").val().trim();
+
+        if (!reportName) {
+            alert("Please enter a report name.");
+            return;
+        }
+
+        // Check if the report name already exists
+        $.ajax({
+            type: "POST",
+            url: "/save_report/",
+            headers: { "X-CSRFToken": csrf_token },
+            data: JSON.stringify({ name: reportName, description: reportDescription }),
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+                console.log("Server response (check name):", response);
+                if (response.exists) {
+                    if (confirm("A report with this name already exists. Do you want to overwrite it?")) {
+                        saveReport(reportName, reportDescription);
+                    }
+                } else {
+                    saveReport(reportName, reportDescription);
+                }
+            },
+            error: function (response) {
+                console.log("Server error (check name):", response);
+                alert("Error checking report name.");
+            }
+        });
+    });
+});
+
+
+function saveReport(reportName, reportDescription) {
+    console.log("saveReport called");
+    const reportData = {
+        name: reportName,
+        description: reportDescription,
+        sections: {},
+    };
+
+    $(".report-sections .section-box").each(function () {
+        const sectionId = $(this).data("section-id");
+        reportData.sections[sectionId] = {};
+
+        $(this).find(".card-body").each(function() {
+            $(this).find("input, textarea").each(function () {
+                const fieldId = $(this).attr("id");
+                const fieldValue = $(this).val();
+                // Update the following line to use the correct format
+                reportData.sections[sectionId][fieldId] = { "value": fieldValue };
+            });
+        });
+    });
+
+    // Send the report data to the server
+    console.log("Sending AJAX request");
+    $.ajax({
+        type: "POST",
+        url: "/save_report/",
+        headers: { "X-CSRFToken": csrf_token },
+        data: JSON.stringify(reportData),
+        contentType: "application/json; charset=utf-8",
+        success: function (response) {
+            console.log("Server response (save report):", response);
+            if (response.success) {
+                alert("Report saved successfully.");
+                $("#saveReportModal").modal("hide");
+            } else {
+                alert("Error saving report.");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error('Error:', textStatus, errorThrown);
+            alert('Error saving report');
+            }
+    });
+}
+
+
+
+
+function cancelReport() {
+    // Reset the form
+    $('input, textarea').val('');
+    $("#template-selector").val("");
+
+    // Remove dynamically added vulnerabilities
+    $(".vulnerability-item").remove();
+
+    // Load the default template
+    if (defaultTemplateId) {
+        updateLayout(defaultTemplateId);
+    }
+}
+
+$("#cancel-report").click(function () {
+    // Call the cancelReport function
+    cancelReport();
+
+    // Close the modal
+    // $("#yourModalId").modal("hide");
+
+    // Or redirect to another page
+    // window.location.href = "/your_redirect_url/";
+});
+
+
+</script>
+
+
+<!-- Save Report Modal -->
+<div class="modal fade" id="saveReportModal" tabindex="-1" aria-labelledby="saveReportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saveReportModalLabel">Save Report</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="reportName">Report Name</label>
+          <input type="text" class="form-control" id="reportName" placeholder="Enter report name">
+        </div>
+        <div class="form-group">
+          <label for="reportDescription">Report Description (optional)</label>
+          <textarea class="form-control" id="reportDescription" rows="3" placeholder="Enter report description"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="confirmSaveReport" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+

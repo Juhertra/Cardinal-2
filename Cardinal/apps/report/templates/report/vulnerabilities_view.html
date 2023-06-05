@@ -1,0 +1,18 @@
+{% extends 'C:\Users\juher\Documents\Unravel Networks\Application\Cardinal\cardinal\templates\main.html' %}
+{% load static %}
+
+{% block content %}
+  <h1>Add Penetration Test Report - Vulnerabilities</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="vulnerabilities">Vulnerabilities</label>
+      <select name="vulnerabilities" class="form-control" multiple>
+        {% for vulnerability in vulnerabilities %}
+          <option value="{{ vulnerability.id }}">{{ vulnerability.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Next</button>
+  </form>
+{% endblock %}

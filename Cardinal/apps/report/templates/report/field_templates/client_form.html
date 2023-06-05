@@ -1,0 +1,97 @@
+{% extends 'report/main.html' %}
+{% load static %}
+
+{% block content %}
+  <h1>Client</h1>
+  <button id="add-client" class="btn btn-primary">Add Client</button>
+  <div id="success-message" style="display: none;"></div>
+  <!-- Add Client Modal -->
+  <div id="add-client-modal" style="display:none;">
+    <form id="add-client-form">
+      {% csrf_token %}
+      <!-- Include form fields for adding new client -->
+      <div class="form-group">
+        <label for="client-name">Name:</label>
+        <input type="name" id="client-name" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="client-contact-person">Contact Person:</label>
+        <input type="text" id="client-contact-person" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="client-email">Email:</label>
+        <input type="email" id="client-email" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="client-phone">Phone:</label>
+        <input type="text" id="client-phone" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="client-address">Address:</label>
+        <input type="text" id="client-address" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="client-start-date">Start Date:</label>
+        <input type="date" id="client-start-date" name="start_date" class="form-control" required>
+      </div>      
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+        $('#add-client').on('click', function() {
+            $('#add-client-modal').show();
+        });
+    
+        $('#add-client-form').on('submit', function(event) {
+            event.preventDefault();
+    
+            // Collect the form data and send it to the server to create a new client
+            let formData = {
+                'name': $('#client-name').val(),
+                'contact_person': $('#client-contact-person').val(),
+                'email': $('#client-email').val(),
+                'phone': $('#client-phone').val(),
+                'address': $('#client-address').val(),
+                'start_date': $('#client-start-date').val(),
+                'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+            };
+    
+            $.ajax({
+                url: '{% url "add_client" %}',
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                  console.log("Response:", response);
+
+                  // Assuming the server returns the new client object
+                  let newClient = response.client;
+
+                  // Update the client dropdown with the new client
+                  $('#client').append(`<option value="${newClient.id}">${newClient.name}</option>`);
+
+                  // Close the add client modal and reset the form
+                  $('#add-client-modal').hide();
+                  $('#add-client-form')[0].reset();
+
+                  // Show the success message
+                  $('#success-message').text(`Client "${newClient.name}" was saved successfully.`);
+                  $('#success-message').show();
+
+                  // Hide the success message after a few seconds
+                  setTimeout(function() {
+                      $('#success-message').hide();
+                  }, 5000);
+                },
+
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        });
+    });
+    </script>
+  
+
+{% endblock %}

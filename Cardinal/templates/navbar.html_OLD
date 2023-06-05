@@ -1,0 +1,116 @@
+<style>
+        .vertical-nav {
+            width: 60px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            background-color: #343a40;
+            overflow-x: hidden;
+            padding-top: 20px;
+            transition: width 0.3s;
+        }
+    
+        .vertical-nav.expanded {
+            width: 200px;
+        }
+    
+        .vertical-nav a {
+            display: flex;
+            align-items: left;
+            justify-content: flex-start;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+    
+        .vertical-nav a .icon-text {
+            display: none;
+            white-space: nowrap;
+            transition: opacity 0.3s;
+            margin-left: 20px;
+            padding-left: 5px;
+            line-height: 1.5;
+        }
+    
+        .nav-icon {
+            font-size: 20px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+    
+        .vertical-nav.expanded a .icon-text {
+            display: inline;
+            opacity: 1;
+        }
+    
+        .vertical-nav a:hover {
+            color: #007bff;
+        }
+    
+        .expand-button {
+            color: #ffffff;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+        }
+    
+    </style>
+    
+    <style>
+        /*...*/
+    </style>
+    
+    <div class="vertical-nav">
+        <a href="{% url 'home' %}" class="navbar-brand mb-4">
+            <i class="fa-solid fa-house fa-beat nav-icon"></i>
+            <span class="icon-text">Cardinal</span>
+        </a>
+        {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}">
+                <i class="fa-solid fa-sign-out fa-beat nav-icon"></i>
+                <span class="icon-text">Logout ({{ user.username }})</span>
+                </a>
+                {% else %}
+                <a href="{% url 'login' %}">
+                <i class="fa-solid fa-sign-in fa-beat nav-icon"></i>
+                <span class="icon-text">Login</span>
+                </a>
+                <a href="{% url 'signup' %}">
+                <i class="fa-solid fa-user-plus fa-beat nav-icon"></i>
+                <span class="icon-text">Sign up</span>
+                </a>
+        {% endif %}
+        <a href="{% url 'main_report' %}">
+            <i class="fa-solid fa-file-pen fa-beat nav-icon"></i>
+            <span class="icon-text">Report</span>
+        </a>
+        <a href="{% url 'report_form' %}">
+            <i class="fa-solid fa-database fa-beat nav-icon"></i>
+            <span class="icon-text">Vulnerabilities</span>
+        </a>
+        <!-- Add more navigation items here -->
+        <div class="expand-button" onclick="toggleNav()" style="position: fixed; bottom: 20px;">
+            <i class="fas fa-angle-double-right" id="expand-icon"></i>
+        </div>
+    </div>
+    
+    
+    <script>
+        function toggleNav() {
+            var nav = document.querySelector('.vertical-nav');
+            nav.classList.toggle('expanded');
+            
+            // Toggle expand/collapse icon
+            var expandIcon = document.getElementById('expand-icon');
+            expandIcon.classList.toggle('fa-angle-double-right');
+            expandIcon.classList.toggle('fa-angle-double-left');
+        }
+    </script>
+    
+    

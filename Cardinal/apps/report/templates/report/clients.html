@@ -1,0 +1,17 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<h1>Clients</h1>
+{% if clients %}
+    <ul>
+        {% for client in clients %}
+            <li>{{ client.name }} ({{ client.days_since_start }} days)</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No clients found.</p>
+{% endif %}
+
+<a href="{% url 'add_client_view' %}" class="btn btn-primary">Add Client</a>
+
+{% endblock %}
