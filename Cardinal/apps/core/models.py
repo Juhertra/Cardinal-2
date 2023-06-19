@@ -16,22 +16,25 @@ class CustomUser(AbstractUser):
 class ReportPermissions(Enum):
     CAN_CREATE_REPORT = 'core.can_create_report'
     CAN_EDIT_REPORT = 'core.can_edit_report'
+    CAN_LOAD_REPORT = 'core.can_load_report'
     CAN_VIEW_REPORT = 'core.can_view_report'
     CAN_SAVE_REPORT = 'core.can_save_report'
     CAN_DELETE_REPORT = 'core.can_delete_report'
     CAN_ADD_REPORT = 'core.can_add_report'
     CAN_APPROVE_REPORT = 'core.can_approve_report'
 
-    CAN_CREATE_TEMPLATE = 'core.can_create_template'
-    CAN_EDIT_TEMPLATE = 'core.can_edit_template'
-    CAN_VIEW_TEMPLATE = 'core.can_view_template'
-    CAN_SAVE_TEMPLATE = 'core.can_save_template'
-    CAN_DELETE_TEMPLATE = 'core.can_delete_template'
-    CAN_ADD_TEMPLATE = 'core.can_add_template'
-    CAN_APPROVE_TEMPLATE = 'core.can_approve_template'
+    CAN_CREATE_REPORT_TEMPLATE = 'core.can_create_report_template'
+    CAN_EDIT_REPORT_TEMPLATE = 'core.can_edit_report_template'
+    CAN_LOAD_REPORT_TEMPLATE = 'core.can_load_report_template'
+    CAN_VIEW_REPORT_TEMPLATE = 'core.can_view_report_template'
+    CAN_SAVE_REPORT_TEMPLATE = 'core.can_save_report_template'
+    CAN_DELETE_REPORT_TEMPLATE = 'core.can_delete_report_template'
+    CAN_ADD_REPORT_TEMPLATE = 'core.can_add_report_template'
+    CAN_APPROVE_REPORT_TEMPLATE = 'core.can_approve_report_template'
 
     CAN_CREATE_CLIENT = 'core.can_create_client'
     CAN_EDIT_CLIENT = 'core.can_edit_client'
+    CAN_LOAD_CLIENT = 'core.can_load_client'
     CAN_VIEW_CLIENT = 'core.can_view_client'
     CAN_SAVE_CLIENT = 'core.can_save_client'
     CAN_DELETE_CLIENT = 'core.can_delete_client'
@@ -50,22 +53,25 @@ class Report(models.Model):
             permissions = [
                 (ReportPermissions.CAN_CREATE_REPORT.value, "can create report"),
                 (ReportPermissions.CAN_EDIT_REPORT.value, "can edit report"),
+                (ReportPermissions.CAN_LOAD_REPORT.value, "can load report"),
                 (ReportPermissions.CAN_VIEW_REPORT.value, "can view report"),
                 (ReportPermissions.CAN_SAVE_REPORT.value, "can save report"),
                 (ReportPermissions.CAN_DELETE_REPORT.value,  "can delete report"),
                 (ReportPermissions.CAN_ADD_REPORT.value, "can add report"),
                 (ReportPermissions.CAN_APPROVE_REPORT.value, "can approve report"),
 
-                (ReportPermissions.CAN_CREATE_TEMPLATE.value, "can create template"),
-                (ReportPermissions.CAN_EDIT_TEMPLATE.value, "can edit template"),
-                (ReportPermissions.CAN_VIEW_TEMPLATE.value, "can view template"),
-                (ReportPermissions.CAN_SAVE_TEMPLATE.value, "can save template"),
-                (ReportPermissions.CAN_DELETE_TEMPLATE.value, "can delete template"),
-                (ReportPermissions.CAN_ADD_TEMPLATE.value, "can add template"),
-                (ReportPermissions.CAN_APPROVE_TEMPLATE.value, "can approve template"),
+                (ReportPermissions.CAN_CREATE_REPORT_TEMPLATE.value, "can create report template"),
+                (ReportPermissions.CAN_EDIT_REPORT_TEMPLATE.value, "can edit report template"),
+                (ReportPermissions.CAN_LOAD_REPORT_TEMPLATE.value, "can load report template"),
+                (ReportPermissions.CAN_VIEW_REPORT_TEMPLATE.value, "can view report template"),
+                (ReportPermissions.CAN_SAVE_REPORT_TEMPLATE.value, "can save report template"),
+                (ReportPermissions.CAN_DELETE_REPORT_TEMPLATE.value, "can delete report template"),
+                (ReportPermissions.CAN_ADD_REPORT_TEMPLATE.value, "can add report template"),
+                (ReportPermissions.CAN_APPROVE_REPORT_TEMPLATE.value, "can approve report template"),
 
                 (ReportPermissions.CAN_CREATE_CLIENT.value, "can create client"),
                 (ReportPermissions.CAN_EDIT_CLIENT.value, "can edit client"),
+                (ReportPermissions.CAN_LOAD_CLIENT.value, "can load client"),
                 (ReportPermissions.CAN_VIEW_CLIENT.value, "can view client") ,
                 (ReportPermissions.CAN_SAVE_CLIENT.value, "can save client") ,
                 (ReportPermissions.CAN_DELETE_CLIENT.value, "can delete client"),

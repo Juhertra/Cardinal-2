@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.core.apps.CoreConfig',
     'apps.report.apps.ReportConfig',
     # 'apps.vulnerability.apps.VulnerabilityConfig',
+    'apps.report.tests',
 ]
 
 MIDDLEWARE = [

@@ -10,11 +10,22 @@ from datetime import datetime
 
 from .forms import ReportForm
 from apps.core.models import ReportPermissions
-from .models import (Attachment, Category, Client, Conclusion,
-                     ExecutiveSummary, ReportSummary,
-                     ReportTemplateLayout, Review, Reviewer,
-                     TestedEnvironment, Tester, Tool, Vulnerability,
-                     ReportDataFiller)
+from .models import (
+    Attachment,
+    Category,
+    Client,
+    Conclusion,
+    ExecutiveSummary,
+    ReportSummary,
+    ReportTemplateLayout,
+    Review,
+    Reviewer,
+    TestedEnvironment,
+    Tester,
+    Tool,
+    Vulnerability,
+    ReportDataFiller,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +123,7 @@ class AddClientView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class CreateReportTemplateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = 'login'
-    permission_required =  ReportPermissions.CAN_CREATE_REPORT.value
+    permission_required = ReportPermissions.CAN_CREATE_REPORT_TEMPLATE.value
 
     def get(self, request):
         """
@@ -129,7 +140,7 @@ class CreateReportTemplateView(LoginRequiredMixin, PermissionRequiredMixin, View
 
 class GetTemplateDataView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = 'login'
-    permission_required = ReportPermissions.CAN_VIEW_TEMPLATE.value
+    permission_required = ReportPermissions.CAN_VIEW_REPORT_TEMPLATE.value
 
     def get(self, request, template_id):
         """
@@ -160,7 +171,7 @@ class GetTemplateDataView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class SaveReportTemplateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = 'login'
-    permission_required = ReportPermissions.CAN_SAVE_TEMPLATE.value
+    permission_required = ReportPermissions.CAN_SAVE_REPORT_TEMPLATE.value
 
     def post(self, request):
         logger.info(f"User authenticated: {request.user.is_authenticated}")
@@ -206,7 +217,7 @@ class SaveReportTemplateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class LoadTemplateSectionsView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = 'login'
-    permission_required = ReportPermissions.CAN_CREATE_REPORT.value
+    permission_required = ReportPermissions.CAN_LOAD_REPORT_TEMPLATE.value
 
     @staticmethod
     def get_template_sections(template_id, user):
@@ -229,7 +240,7 @@ class LoadTemplateSectionsView(LoginRequiredMixin, PermissionRequiredMixin, View
 
 class CancelTemplateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     login_url = 'login'
-    permission_required = ReportPermissions.CAN_SAVE_TEMPLATE.value
+    permission_required = ReportPermissions.CAN_SAVE_REPORT_TEMPLATE.value
 
     def get(self, request):
         """
